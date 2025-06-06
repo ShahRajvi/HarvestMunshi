@@ -585,10 +585,40 @@ header h1 {
     color: var(--accent-primary);
 }
 
+.config-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: var(--spacing-unit);
+    position: relative;
+}
+
 .config-content {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-unit);
+}
+
+.config-action-button {
+    background: var(--accent-primary);
+    color: var(--text-primary);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 12px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.config-action-button:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .crops-list-panel {
@@ -640,8 +670,13 @@ header h1 {
 }
 
 .crop-icon {
-    font-size: 2.5rem;
+    font-size: 4rem;
     margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem 0;
 }
 
 .crop-info {
@@ -702,26 +737,330 @@ header h1 {
     background: var(--accent-secondary);
 }
 
-.config-header {
+@media (max-width: 768px) {
+    .config-action-button {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .config-action-button .btn-label {
+        display: none;
+    }
+    
+    .config-action-button {
+        padding: calc(var(--spacing-unit) * 0.75);
+        aspect-ratio: 1;
+    }
+}
+
+.crop-name-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notes-icon {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    font-size: 1rem;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.notes-icon:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: var(--spacing-unit);
+    padding-bottom: var(--spacing-unit);
+    border-bottom: 1px solid var(--chart-grid);
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+}
+
+.back-button:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.back-icon {
+    font-size: 1.2rem;
+}
+
+.crop-details-content {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-unit);
+}
+
+.crop-details-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: var(--spacing-unit);
+    padding-bottom: var(--spacing-unit);
+    border-bottom: 1px solid var(--chart-grid);
+}
+
+.crop-emoji-large {
+    font-size: 6rem;
+    line-height: 1;
+}
+
+.crop-info-large h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.crop-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.total-harvests {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.notes-section {
+    margin-top: var(--spacing-unit);
+}
+
+.notes-section h3 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+#crop-notes {
+    width: 100%;
+    min-height: 200px;
+    background: var(--bg-panel);
+    border: 1px solid var(--chart-grid);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    resize: vertical;
+}
+
+#crop-notes:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+@media (max-width: 768px) {
+    .crop-details-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .crop-emoji-large {
+        font-size: 5rem;
+    }
+}
+
+.saved-notes {
+    margin-bottom: var(--spacing-unit);
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: var(--spacing-unit);
+}
+
+.note-entry {
+    margin-bottom: 0.75rem;
+    position: relative;
+}
+
+.note-content {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 1rem;
+    background: var(--bg-panel);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+}
+
+.note-text {
+    color: var(--text-primary);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    flex: 1;
+}
+
+.note-actions {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.note-content:hover .note-actions {
+    opacity: 1;
+}
+
+.btn-edit {
+    color: var(--text-secondary);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-edit:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.note-edit-form {
+    background: var(--bg-panel);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-top: 0.5rem;
+}
+
+.note-edit-input {
+    width: 100%;
+    min-height: 100px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--chart-grid);
+    border-radius: calc(var(--border-radius) - 4px);
+    padding: 0.75rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.5;
     margin-bottom: 1rem;
+    resize: vertical;
+}
+
+.note-edit-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.note-edit-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
 }
 
 .btn-secondary {
     background-color: var(--bg-secondary);
     color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
+    padding: calc(var(--spacing-unit) * 0.75) var(--spacing-unit);
+    border: 1px solid var(--chart-grid);
+    border-radius: calc(var(--border-radius) - 4px);
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background-color 0.2s ease;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
 .btn-secondary:hover {
-    background-color: var(--bg-hover);
+    background-color: var(--chart-grid);
+    transform: translateY(-1px);
+}
+
+/* Scrollbar styling for the notes container */
+.saved-notes::-webkit-scrollbar {
+    width: 8px;
+}
+
+.saved-notes::-webkit-scrollbar-track {
+    background: var(--bg-panel);
+    border-radius: 4px;
+}
+
+.saved-notes::-webkit-scrollbar-thumb {
+    background: var(--chart-grid);
+    border-radius: 4px;
+}
+
+.saved-notes::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+#crop-notes-input {
+    width: 100%;
+    min-height: 100px;
+    background: var(--bg-panel);
+    border: 1px solid var(--chart-grid);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    resize: vertical;
+}
+
+#crop-notes-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.notes-date-group {
+    margin-bottom: 2rem;
+}
+
+.notes-date-header {
+    color: var(--accent-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--chart-grid);
+}
+
+.notes-group-content {
+    padding-left: 1rem;
+    border-left: 2px solid var(--chart-grid);
+}
+
+.notes-group-content .note-entry {
+    margin-bottom: 0.75rem;
+    position: relative;
+}
+
+.notes-group-content .note-entry::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--chart-grid);
+    border-radius: 50%;
+    transform: translateY(-50%);
+}
+
+.notes-group-content .note-entry:hover::before {
+    background: var(--accent-primary);
 } 

@@ -47,11 +47,21 @@ const harvestLogger = {
     }
 };
 
+
+
 const app = express();
 const PORT = 3001;
 
 // Parse JSON bodies
 app.use(express.json());
+
+// Add keep-alive settings
+app.use((req, res, next) => {
+    // Set keep-alive header
+    res.set('Connection', 'keep-alive');
+    res.set('Keep-Alive', 'timeout=5, max=1000');
+    next();
+});
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -124,7 +134,37 @@ if (!fs.existsSync(harvestLogFile)) {
     fs.writeFileSync(harvestLogFile, 'timestamp,potId,cropName,qty,totalHarvest\n');
 }
 
-// Start the server
-app.listen(PORT, () => {
+
+
+// Error handling for uncaught exceptions
+process.on('uncaughtException', (err) => {
+    logger.error('Uncaught Exception:', err);
+    // Keep the process running despite the error
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Keep the process running despite the rejection
+});
+
+// Start the server with error handling
+const server = app.listen(PORT, '0.0.0.0', () => {
     logger.info(`Server is running at http://localhost:${PORT}`);
 });
+
+// Handle server errors
+server.on('error', (err) => {
+    logger.error('Server error:', err);
+    // Attempt to restart the server if it crashes
+    if (err.code === 'EADDRINUSE') {
+        logger.info('Port is busy, retrying in 10 seconds...');
+        setTimeout(() => {
+            server.close();
+            server.listen(PORT);
+        }, 10000);
+    }
+});
+
+// Keep the connection alive
+server.keepAliveTimeout = 120000; // 2 minutes
+server.headersTimeout = 125000; // 2 minutes + 5 seconds

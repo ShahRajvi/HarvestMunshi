@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harvest Munshi - Track Your Triumphs</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/svg+xml" href="assets/cucumber-mascot.svg">
+    <link rel="icon" type="image/svg+xml" href="assets/cucumber-gemini.jpeg">
     <link rel="alternate icon" type="image/png" href="assets/cucumber-mascot.png">
     <link rel="apple-touch-icon" href="assets/cucumber-mascot.png">
     <meta name="theme-color" content="#1a1d21">
@@ -16,7 +16,7 @@
             <div class="brand">
                 <div class="brand-container">
                     <picture class="brand-logo-container">
-                        <source srcset="assets/cucumber-mascot.svg" type="image/svg+xml">
+                        <source srcset="assets/cucumber-gemini.jpeg" type="image/svg+xml">
                         <img src="assets/cucumber-mascot.png" alt="Cute cucumber mascot with a farmer's hat" class="brand-logo">
                     </picture>
                     <h1>Harvest Munshi</h1>
@@ -61,15 +61,15 @@
             <div id="config" class="page-content">
                 <div class="config-content">
                     <div class="config-header">
-                        <button id="add-new-crop-button" class="btn-primary btn-large">
-                            <span class="btn-icon">🌱</span>
-                            Add a new crop
-                        </button>
-                        <button id="export-logs-button" class="btn-secondary" title="Export Logs">
+                        <button id="export-logs-button" class="config-action-button">
                             <span class="btn-icon">📥</span>
-                            Export Logs
+                            <span class="btn-label">Export Logs</span>
                         </button>
                     </div>
+                    <button id="add-new-crop-button" class="btn-primary btn-large">
+                        <span class="btn-icon">🌱</span>
+                        Add a new crop
+                    </button>
                     <div class="panel" id="add-crop-form" style="display: none;">
                         <h2>Add New Crop</h2>
                         <form id="harvest-config-form">
@@ -107,6 +107,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div id="crop-details" class="page-content">
+                <!-- Crop details content will be dynamically inserted here -->
             </div>
         </div>
         
