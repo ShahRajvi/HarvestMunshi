@@ -160,6 +160,30 @@ function getCropEmoji(cropName) {
     return matchingEmoji ? matchingEmoji[1] : '🌱';
 }
 
+// Helper function to log harvest data
+async function logHarvestData(potId, cropName, quantity, totalHarvest) {
+    try {
+        const response = await fetch('/api/log-harvest', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                potId,
+                cropName,
+                quantity,
+                totalHarvest
+            })
+        });
+        
+        if (!response.ok) {
+            console.error('Failed to log harvest data');
+        }
+    } catch (error) {
+        console.error('Error logging harvest data:', error);
+    }
+}
+
 // Add a new harvest
 function addHarvest(potId) {
     const harvest = {
@@ -170,6 +194,15 @@ function addHarvest(potId) {
     };
     
     harvestData.harvests.push(harvest);
+    
+    // Get crop name and new total harvest count
+    const crop = harvestData.crops.find(c => c.potId === potId);
+    if (crop) {
+        const totalHarvest = calculateTotalHarvests(potId);
+        // Log the single harvest (quantity: 1) and the new total
+        logHarvestData(potId, crop.name, 1, totalHarvest);
+    }
+    
     saveData();
     updateUI();
 }
@@ -303,6 +336,34 @@ function deleteCrop(potId) {
     updateUI();
 }
 
+// Export logs functionality
+async function downloadLogs() {
+    try {
+        const response = await fetch('/api/download-logs');
+        if (!response.ok) {
+            throw new Error('Failed to download logs');
+        }
+
+        // Get the blob from the response
+        const blob = await response.blob();
+        
+        // Create a temporary link and trigger download
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'harvest-logs.zip';
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error('Error downloading logs:', error);
+        alert('Failed to download logs. Please try again.');
+    }
+}
+
 // Tab switching functionality
 document.addEventListener('DOMContentLoaded', () => {
     // Load saved data
@@ -385,4 +446,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle window resize for responsive charts
     window.addEventListener('resize', updateUI);
+
+    // Set up export logs button
+    const exportLogsButton = document.getElementById('export-logs-button');
+    if (exportLogsButton) {
+        exportLogsButton.addEventListener('click', downloadLogs);
+    }
 }); 
