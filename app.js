@@ -47,7 +47,18 @@ const harvestLogger = {
     }
 };
 
-
+// Configer crop Notes Logger
+const cropNotesLogger = {
+    logCropNotes: (data) => {
+        const timestamp = new Date().toISOString();
+        const logEntry = `${timestamp},${data.potId},${data.cropName},${data.notes}\n`;
+        fs.appendFile(`logs/HarvestNotes/${data.cropName}.txt`, logEntry, (err) => {
+            if (err) {
+                logger.error('Error writing to crop notes log:', err);
+            }
+        });
+    }
+};
 
 const app = express();
 const PORT = 3001;
@@ -134,7 +145,11 @@ if (!fs.existsSync(harvestLogFile)) {
     fs.writeFileSync(harvestLogFile, 'timestamp,potId,cropName,qty,totalHarvest\n');
 }
 
-
+// Create crop notes log file with headers if it doesn't exist
+const cropNotesLogFile = `logs/HarvestNotes/${data.cropName}.txt`;
+if (!fs.existsSync(cropNotesLogFile)) {
+    fs.writeFileSync(cropNotesLogFile, 'timestamp,potId,cropName,notes\n');
+}
 
 // Error handling for uncaught exceptions
 process.on('uncaughtException', (err) => {
