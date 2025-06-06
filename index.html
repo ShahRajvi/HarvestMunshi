@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest Munshi - Track Your Triumphs</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="assets/cucumber-mascot.svg">
+    <link rel="alternate icon" type="image/png" href="assets/cucumber-mascot.png">
+    <link rel="apple-touch-icon" href="assets/cucumber-mascot.png">
+    <meta name="theme-color" content="#1a1d21">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="brand">
+                <div class="brand-container">
+                    <picture class="brand-logo-container">
+                        <source srcset="assets/cucumber-mascot.svg" type="image/svg+xml">
+                        <img src="assets/cucumber-mascot.png" alt="Cute cucumber mascot with a farmer's hat" class="brand-logo">
+                    </picture>
+                    <h1>Harvest Munshi</h1>
+                </div>
+                <p class="tagline">Track Your Triumphs from Seed to Table</p>
+            </div>
+        </header>
+        
+        <div class="tab-content">
+            <div id="dashboard" class="page-content active">
+                <div class="dashboard-content">
+                    <div class="main-chart">
+                        <div class="chart-container">
+                            <div class="total-harvest-display">
+                                <svg class="harvest-ring" viewBox="0 0 100 100">
+                                    <circle class="ring-background" cx="50" cy="50" r="45" />
+                                    <circle class="ring-progress" cx="50" cy="50" r="45" />
+                                </svg>
+                                <div class="harvest-number" id="main-harvest-number">
+                                    <span class="number">0</span>
+                                    <span class="label">Total Harvests</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="crops-grid">
+                        <!-- Crop cards will be dynamically added here -->
+                    </div>
+
+                    <div class="harvest-list panel">
+                        <h3>Recent Harvests</h3>
+                        <div class="panel-content">
+                            <ul id="harvest-items">
+                                <!-- Harvest items will be populated here -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="config" class="page-content">
+                <div class="config-content">
+                    <button id="add-new-crop-button" class="btn-primary btn-large">
+                        <span class="btn-icon">🌱</span>
+                        Add a new crop
+                    </button>
+                    <div class="panel" id="add-crop-form" style="display: none;">
+                        <h2>Add New Crop</h2>
+                        <form id="harvest-config-form">
+                            <div class="form-group">
+                                <label for="pot-id">Pot ID</label>
+                                <div class="input-group">
+                                    <input type="text" id="pot-id" placeholder="Enter pot ID" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="crop-name">Crop Name</label>
+                                <div class="input-group">
+                                    <input type="text" id="crop-name" placeholder="Enter crop name" required>
+                                    <button type="button" id="add-crop-type" class="btn-primary">Add Crop</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="panel crops-list-panel">
+                        <h2>Configured Crops</h2>
+                        <div class="configured-crops-container">
+                            <table class="crops-table">
+                                <thead>
+                                    <tr>
+                                        <th>Pot ID</th>
+                                        <th>Crop Name</th>
+                                        <th>Total Harvest</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="configured-crops">
+                                    <!-- Configured crops will be listed here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="bottom-tabs">
+            <div class="tabs">
+                <a href="#dashboard" class="tab-button active" data-page="dashboard">
+                    <span class="tab-icon">📊</span>
+                    <span class="tab-label">Dashboard</span>
+                </a>
+                <a href="#config" class="tab-button" data-page="config">
+                    <span class="tab-icon">⚙️</span>
+                    <span class="tab-label">Config</span>
+                </a>
+            </div>
+        </footer>
+    </div>
+    <script src="client.js"></script>
+</body>
+</html> 
