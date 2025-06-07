@@ -154,7 +154,7 @@ function getCropEmoji(cropName) {
         // Root vegetables
         'carrot': '🥕',
         'potato': '🥔',
-        'beet': '🥔',
+        'beet': '🌰',
         
         // Leafy greens & Herbs
         'lettuce': '🥬',
@@ -174,6 +174,8 @@ function getCropEmoji(cropName) {
         // Peppers
         'pepper': '🫑',
         'bell peppers': '🫑',
+        'jalapeno': '🌶️',
+        'hot pepper mix': '🌶️',
         'cayenne peppers': '🌶️',
         'habanero': '🌶️',
         
@@ -367,12 +369,24 @@ function addCropType() {
             alert('A crop with this Pot ID already exists!');
             return;
         }
+
+        // Check if pot ID is a number
+        if (isNaN(potId)) {
+            alert('Pot ID must be a number!');
+            return;
+        }
         
         harvestData.crops.push(cropEntry);
         potIdInput.value = '';
         cropNameInput.value = '';
         saveData();
         updateUI();
+
+        // Create a new crop notes log file with headers if it doesn't exist
+        const cropNotesLogFile = `logs/HarvestNotes/${potId}_${cropName}.txt`;
+        if (!fs.existsSync(cropNotesLogFile)) {
+            fs.writeFileSync(cropNotesLogFile, 'timestamp,potId,cropName,notes\n');
+        }
     }
 }
 
