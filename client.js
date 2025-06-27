@@ -166,6 +166,11 @@ function getCropEmoji(cropName) {
         'tulsi': '🌱',
         'cilantro': '🌿',
         'fenugreek': '🌿',
+        'basil': '🌿',
+        'thyme': '🌿',
+        'sage': '🌿',
+        'rosemary': '🌿',
+
         
         // Alliums
         'onion': '🧅',
@@ -191,6 +196,13 @@ function getCropEmoji(cropName) {
         // Flowers
         'marigold': '🌼',
         'carnation': '🌸',
+        'rose': '🌹',
+        'sunflower': '🌻',
+        'daisy': '🌼',
+        'lily': '🪷',
+        'tulip': '🌷',
+        'hibiscus': '🌺',
+        'peony': '🌸',
         
         // Default for unknown crops
         'corn': '🌽',

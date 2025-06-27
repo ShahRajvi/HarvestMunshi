@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.harvestmunshi.app.ui.home.HomeFragment"
+        android:label="Home">
+        <action
+            android:id="@+id/action_home_to_harvest"
+            app:destination="@id/harvestFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/harvestFragment"
+        android:name="com.harvestmunshi.app.ui.harvest.HarvestFragment"
+        android:label="Harvest" />
+
+</navigation> 

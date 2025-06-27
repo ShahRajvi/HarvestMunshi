@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_primary"
+    android:backgroundTint="#EFEAD4">
+
+    <ImageView
+        android:id="@+id/splashImage"
+        android:layout_width="225dp"
+        android:layout_height="225dp"
+        android:layout_gravity="center"
+        android:background="@drawable/rounded_bg"
+        android:backgroundTint="#E9E3AE"
+        android:contentDescription="@string/app_name"
+        android:padding="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/cucumber_gemini" />
+
+</FrameLayout> 
