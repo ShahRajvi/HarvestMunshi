@@ -1,22 +1,143 @@
+// Import Firestore from firebaseconfig.js
+import { db } from './firebaseconfig.js';
+import { collection, getDocs, setDoc, doc, updateDoc, deleteDoc, addDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
 // Store the harvest data
 let harvestData = {
     crops: [],
     harvests: []
 };
 
-// Load data from localStorage if available
-function loadData() {
-    const savedData = localStorage.getItem('harvestMunshiData');
-    if (savedData) {
-        harvestData = JSON.parse(savedData);
+// Firestore collection references
+const cropsCol = collection(db, 'crops');
+const harvestsCol = collection(db, 'harvests');
+
+// Load data from Firestore
+async function loadData() {
+    // Load crops
+    const cropsSnapshot = await getDocs(cropsCol);
+    harvestData.crops = cropsSnapshot.docs.map(doc => doc.data());
+    // Load harvests
+    const harvestsSnapshot = await getDocs(harvestsCol);
+    harvestData.harvests = harvestsSnapshot.docs.map(doc => doc.data());
+    updateUI();
+}
+
+// Save crop to Firestore
+async function saveCrop(crop) {
+    await setDoc(doc(cropsCol, crop.potId), crop);
+}
+
+// Delete crop from Firestore
+async function deleteCropFirestore(potId) {
+    await deleteDoc(doc(cropsCol, potId));
+}
+
+// Save harvest to Firestore
+async function saveHarvest(harvest) {
+    await addDoc(harvestsCol, harvest);
+}
+
+// Save all harvests (for batch update, if needed)
+async function saveAllHarvests() {
+    // Not implemented: Firestore does not support batch overwrite easily in client SDK
+}
+
+// Save notes for a crop
+async function saveCropNotesFirestore(potId, notes) {
+    const cropRef = doc(cropsCol, potId);
+    await updateDoc(cropRef, { notes });
+}
+
+// Override saveData to sync to Firestore
+function saveData() {
+    // Save all crops
+    harvestData.crops.forEach(crop => saveCrop(crop));
+    // Save all harvests
+    // (For new harvests, use saveHarvest when adding)
+}
+
+// Override addCropType to save to Firestore
+function addCropType() {
+    const potIdInput = document.getElementById('pot-id');
+    const cropNameInput = document.getElementById('crop-name');
+    const potId = potIdInput.value.trim();
+    const cropName = cropNameInput.value.trim();
+    
+    if (potId && cropName) {
+        const cropEntry = {
+            potId: potId,
+            name: cropName,
+            notes: []
+        };
+        // Check if pot ID already exists
+        const existingCrop = harvestData.crops.find(crop => crop.potId === potId);
+        if (existingCrop) {
+            alert('A crop with this Pot ID already exists!');
+            return;
+        }
+        if (isNaN(potId)) {
+            alert('Pot ID must be a number!');
+            return;
+        }
+        harvestData.crops.push(cropEntry);
+        potIdInput.value = '';
+        cropNameInput.value = '';
+        saveCrop(cropEntry);
         updateUI();
     }
 }
 
-// Save data to localStorage
-function saveData() {
-    localStorage.setItem('harvestMunshiData', JSON.stringify(harvestData));
+// Override deleteCrop to delete from Firestore
+function deleteCrop(potId) {
+    harvestData.crops = harvestData.crops.filter(crop => crop.potId !== potId);
+    deleteCropFirestore(potId);
+    updateUI();
 }
+
+// Override addHarvest to save to Firestore
+function addHarvest(potId) {
+    const harvest = {
+        potId: potId,
+        date: new Date().toISOString(),
+        quantity: 1,
+        unit: 'unit'
+    };
+    harvestData.harvests.push(harvest);
+    saveHarvest(harvest);
+    updateUI();
+}
+
+// Override saveCropNotes to save to Firestore
+window.saveCropNotes = async function(potId) {
+    const notesTextarea = document.getElementById('crop-notes-input');
+    if (!notesTextarea) return;
+    const cropIndex = harvestData.crops.findIndex(c => c.potId === potId);
+    if (cropIndex === -1) return;
+    if (!harvestData.crops[cropIndex].notes) {
+        harvestData.crops[cropIndex].notes = [];
+    }
+    const newNote = {
+        text: notesTextarea.value.trim(),
+        timestamp: new Date().toISOString()
+    };
+    if (newNote.text) {
+        harvestData.crops[cropIndex].notes.unshift(newNote);
+        notesTextarea.value = '';
+        await saveCropNotesFirestore(potId, harvestData.crops[cropIndex].notes);
+        updateNotesDisplay(potId);
+    }
+};
+
+// Listen for Firestore changes (real-time sync)
+onSnapshot(cropsCol, (snapshot) => {
+    harvestData.crops = snapshot.docs.map(doc => doc.data());
+    updateUI();
+});
+onSnapshot(harvestsCol, (snapshot) => {
+    harvestData.harvests = snapshot.docs.map(doc => doc.data());
+    updateUI();
+});
 
 // Create a simple bar chart
 function createBarChart(container, data, labels) {
@@ -240,29 +361,6 @@ async function logHarvestData(potId, cropName, quantity, totalHarvest) {
     }
 }
 
-// Add a new harvest
-function addHarvest(potId) {
-    const harvest = {
-        potId: potId,
-        date: new Date().toISOString(),
-        quantity: 1,
-        unit: 'unit'
-    };
-    
-    harvestData.harvests.push(harvest);
-    
-    // Get crop name and new total harvest count
-    const crop = harvestData.crops.find(c => c.potId === potId);
-    if (crop) {
-        const totalHarvest = calculateTotalHarvests(potId);
-        // Log the single harvest (quantity: 1) and the new total
-        logHarvestData(potId, crop.name, 1, totalHarvest);
-    }
-    
-    saveData();
-    updateUI();
-}
-
 // Update the UI with current data
 function updateUI() {
     const totalHarvests = harvestData.harvests.length;
@@ -359,81 +457,6 @@ function updateUI() {
         const cropDistribution = harvestData.crops.map(crop => calculateTotalHarvests(crop.potId));
         const cropLabels = harvestData.crops.map(crop => crop.name);
         createDonutChart(distributionChartContainer, cropDistribution, cropLabels);
-    }
-}
-
-// Add new crop type
-function addCropType() {
-    const potIdInput = document.getElementById('pot-id');
-    const cropNameInput = document.getElementById('crop-name');
-    const potId = potIdInput.value.trim();
-    const cropName = cropNameInput.value.trim();
-    
-    if (potId && cropName) {
-        const cropEntry = {
-            potId: potId,
-            name: cropName
-        };
-        
-        // Check if pot ID already exists
-        const existingCrop = harvestData.crops.find(crop => crop.potId === potId);
-        if (existingCrop) {
-            alert('A crop with this Pot ID already exists!');
-            return;
-        }
-
-        // Check if pot ID is a number
-        if (isNaN(potId)) {
-            alert('Pot ID must be a number!');
-            return;
-        }
-        
-        harvestData.crops.push(cropEntry);
-        potIdInput.value = '';
-        cropNameInput.value = '';
-        saveData();
-        updateUI();
-
-        // Create a new crop notes log file with headers if it doesn't exist
-        const cropNotesLogFile = `logs/HarvestNotes/${potId}_${cropName}.txt`;
-        if (!fs.existsSync(cropNotesLogFile)) {
-            fs.writeFileSync(cropNotesLogFile, 'timestamp,potId,cropName,notes\n');
-        }
-    }
-}
-
-// Delete crop type
-function deleteCrop(potId) {
-    harvestData.crops = harvestData.crops.filter(crop => crop.potId !== potId);
-    saveData();
-    updateUI();
-}
-
-// Export logs functionality
-async function downloadLogs() {
-    try {
-        const response = await fetch('/api/download-logs');
-        if (!response.ok) {
-            throw new Error('Failed to download logs');
-        }
-
-        // Get the blob from the response
-        const blob = await response.blob();
-        
-        // Create a temporary link and trigger download
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'harvest-logs.zip';
-        document.body.appendChild(a);
-        a.click();
-        
-        // Cleanup
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-    } catch (error) {
-        console.error('Error downloading logs:', error);
-        alert('Failed to download logs. Please try again.');
     }
 }
 
@@ -699,33 +722,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize the notes display
         updateNotesDisplay(potId);
     }
-
-    // Save crop notes
-    window.saveCropNotes = function(potId) {
-        const notesTextarea = document.getElementById('crop-notes-input');
-        if (!notesTextarea) return;
-
-        const cropIndex = harvestData.crops.findIndex(c => c.potId === potId);
-        if (cropIndex === -1) return;
-
-        // Initialize notes array if it doesn't exist
-        if (!harvestData.crops[cropIndex].notes) {
-            harvestData.crops[cropIndex].notes = [];
-        }
-
-        // Add new note with timestamp
-        const newNote = {
-            text: notesTextarea.value.trim(),
-            timestamp: new Date().toISOString()
-        };
-
-        if (newNote.text) {
-            harvestData.crops[cropIndex].notes.unshift(newNote); // Add to beginning of array
-            notesTextarea.value = ''; // Clear input
-            saveData();
-            updateNotesDisplay(potId); // Update the notes display
-        }
-    };
 
     // Listen for hash changes
     window.addEventListener('hashchange', handleNavigation);
