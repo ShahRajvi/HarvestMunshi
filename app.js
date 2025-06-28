@@ -3,6 +3,7 @@ const path = require('path');
 const winston = require('winston');
 const fs = require('fs');
 const archiver = require('archiver');
+const HarvestLogger = require('./harvestLogger');
 
 // Configure general logger
 const logger = winston.createLogger({
@@ -47,6 +48,33 @@ const harvestLogger = {
     }
 };
 
+// Configure harvest notes logger
+const harvestNotesLogger = {
+    logHarvestNotes: async (data) => {
+        try {
+            await HarvestLogger.logHarvestNotes(data.potId, data.cropName, data.notes);
+        } catch (err) {
+            logger.error('Error writing to harvest notes log:', err);
+            throw err;
+        }
+    },
+    getHarvestNotes: async (potId, cropName) => {
+        try {
+            return await HarvestLogger.getHarvestNotes(potId, cropName);
+        } catch (err) {
+            logger.error('Error reading harvest notes:', err);
+            throw err;
+        }
+    },
+    listHarvestNotes: async () => {
+        try {
+            return await HarvestLogger.listHarvestNotes();
+        } catch (err) {
+            logger.error('Error listing harvest notes:', err);
+            throw err;
+        }
+    }
+};
 
 
 const app = express();
@@ -83,6 +111,47 @@ app.post('/api/log-harvest', (req, res) => {
 
     harvestLogger.logHarvest({ potId, cropName, quantity, totalHarvest });
     res.json({ success: true });
+});
+
+// Endpoint to log harvest notes
+app.post('/api/log-harvest-notes', async (req, res) => {
+    const { potId, cropName, notes } = req.body;
+
+    if (!potId || !cropName || !notes) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        await harvestNotesLogger.logHarvestNotes({ potId, cropName, notes });
+        res.json({ success: true });
+    } catch (error) {
+        logger.error('Error logging harvest notes:', error);
+        res.status(500).json({ error: 'Failed to log harvest notes' });
+    }
+});
+
+// New endpoint to get harvest notes
+app.get('/api/harvest-notes/:potId/:cropName', async (req, res) => {
+    const { potId, cropName } = req.params;
+
+    try {
+        const notes = await harvestNotesLogger.getHarvestNotes(potId, cropName);
+        res.json({ notes });
+    } catch (error) {
+        logger.error('Error retrieving harvest notes:', error);
+        res.status(500).json({ error: 'Failed to retrieve harvest notes' });
+    }
+});
+
+// New endpoint to list all harvest notes
+app.get('/api/harvest-notes', async (req, res) => {
+    try {
+        const notes = await harvestNotesLogger.listHarvestNotes();
+        res.json({ notes });
+    } catch (error) {
+        logger.error('Error listing harvest notes:', error);
+        res.status(500).json({ error: 'Failed to list harvest notes' });
+    }
 });
 
 // Endpoint to download logs
@@ -132,6 +201,12 @@ app.get('/', (req, res) => {
 const harvestLogFile = 'logs/harvestcrops.txt';
 if (!fs.existsSync(harvestLogFile)) {
     fs.writeFileSync(harvestLogFile, 'timestamp,potId,cropName,qty,totalHarvest\n');
+}
+
+// Create Harvest Notes log file with headers if it doesn't exist
+const harvestNotesLogFile = 'logs/HarvestNotes/cropnotes.txt';
+if (!fs.existsSync(harvestNotesLogFile)) {
+    fs.writeFileSync(harvestNotesLogFile, 'timestamp,potId,cropName,notes\n');
 }
 
 

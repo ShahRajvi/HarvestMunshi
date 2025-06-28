@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Harvest Munshi</string>
+    <string name="add_harvest">Add Harvest</string>
+    <string name="harvest_list">Harvest List</string>
+</resources> 
