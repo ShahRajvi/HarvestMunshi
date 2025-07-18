@@ -463,7 +463,7 @@ function updateUI() {
 // Tab switching functionality
 document.addEventListener('DOMContentLoaded', () => {
     // Load saved data
-    loadData();
+    `loadData`();
 
     // Set up tab switching
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -878,3 +878,6 @@ document.getElementById('export-logs-button').addEventListener('click', async ()
         console.error('Error downloading logs:', error);
     }
 }); 
+
+window.addHarvest = addHarvest;
+window.deleteCrop = deleteCrop; 
