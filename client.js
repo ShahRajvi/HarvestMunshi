@@ -16,7 +16,11 @@ const harvestsCol = collection(db, 'harvests');
 async function loadData() {
     // Load crops
     const cropsSnapshot = await getDocs(cropsCol);
-    harvestData.crops = cropsSnapshot.docs.map(doc => doc.data());
+    harvestData.crops = cropsSnapshot.docs.map(doc => {
+        const data = doc.data();
+        // Always use doc.id as potId, and ensure it's a string
+        return { ...data, potId: doc.id };
+    });
     // Load harvests
     const harvestsSnapshot = await getDocs(harvestsCol);
     harvestData.harvests = harvestsSnapshot.docs.map(doc => doc.data());
@@ -25,12 +29,14 @@ async function loadData() {
 
 // Save crop to Firestore
 async function saveCrop(crop) {
-    await setDoc(doc(cropsCol, crop.potId), crop);
+    // Always use string for potId
+    const potId = String(crop.potId);
+    await setDoc(doc(cropsCol, potId), { ...crop, potId });
 }
 
 // Delete crop from Firestore
 async function deleteCropFirestore(potId) {
-    await deleteDoc(doc(cropsCol, potId));
+    await deleteDoc(doc(cropsCol, String(potId)));
 }
 
 // Save harvest to Firestore
@@ -45,7 +51,7 @@ async function saveAllHarvests() {
 
 // Save notes for a crop
 async function saveCropNotesFirestore(potId, notes) {
-    const cropRef = doc(cropsCol, potId);
+    const cropRef = doc(cropsCol, String(potId));
     await updateDoc(cropRef, { notes });
 }
 
@@ -63,15 +69,15 @@ function addCropType() {
     const cropNameInput = document.getElementById('crop-name');
     const potId = potIdInput.value.trim();
     const cropName = cropNameInput.value.trim();
-    
     if (potId && cropName) {
+        const potIdStr = String(potId);
         const cropEntry = {
-            potId: potId,
+            potId: potIdStr,
             name: cropName,
             notes: []
         };
-        // Check if pot ID already exists
-        const existingCrop = harvestData.crops.find(crop => crop.potId === potId);
+        // Check if pot ID already exists (as string)
+        const existingCrop = harvestData.crops.find(crop => String(crop.potId) === potIdStr);
         if (existingCrop) {
             alert('A crop with this Pot ID already exists!');
             return;
@@ -90,15 +96,17 @@ function addCropType() {
 
 // Override deleteCrop to delete from Firestore
 function deleteCrop(potId) {
-    harvestData.crops = harvestData.crops.filter(crop => crop.potId !== potId);
-    deleteCropFirestore(potId);
+    const potIdStr = String(potId);
+    harvestData.crops = harvestData.crops.filter(crop => String(crop.potId) !== potIdStr);
+    deleteCropFirestore(potIdStr);
     updateUI();
 }
 
 // Override addHarvest to save to Firestore
 function addHarvest(potId) {
+    const potIdStr = String(potId);
     const harvest = {
-        potId: potId,
+        potId: potIdStr,
         date: new Date().toISOString(),
         quantity: 1,
         unit: 'unit'
@@ -131,7 +139,10 @@ window.saveCropNotes = async function(potId) {
 
 // Listen for Firestore changes (real-time sync)
 onSnapshot(cropsCol, (snapshot) => {
-    harvestData.crops = snapshot.docs.map(doc => doc.data());
+    harvestData.crops = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return { ...data, potId: doc.id };
+    });
     updateUI();
 });
 onSnapshot(harvestsCol, (snapshot) => {
@@ -602,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Save note edit
-    window.saveNoteEdit = function(potId, timestamp) {
+    window.saveNoteEdit = async function(potId, timestamp) {
         const noteEntry = document.querySelector(`.note-entry[data-timestamp="${timestamp}"]`);
         if (!noteEntry) return;
 
@@ -621,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (noteIndex === -1) return;
 
         harvestData.crops[cropIndex].notes[noteIndex].text = newText;
-        saveData();
+        await saveCropNotesFirestore(potId, harvestData.crops[cropIndex].notes);
         updateNotesDisplay(potId);
     }
 
@@ -638,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Delete note
-    window.deleteNote = function(potId, timestamp) {
+    window.deleteNote = async function(potId, timestamp) {
         if (!confirm('Are you sure you want to delete this note?')) return;
 
         const cropIndex = harvestData.crops.findIndex(c => c.potId === potId);
@@ -647,8 +658,8 @@ document.addEventListener('DOMContentLoaded', () => {
         harvestData.crops[cropIndex].notes = harvestData.crops[cropIndex].notes.filter(
             note => note.timestamp !== timestamp
         );
-        
-        saveData();
+        await saveCropNotesFirestore(potId, harvestData.crops[cropIndex].notes);
+
         updateNotesDisplay(potId);
     }
 
