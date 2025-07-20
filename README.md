@@ -1,6 +1,6 @@
-# Harvest Notes Logger
+# Harvest Munshi
 
-A cross-platform application for logging and managing harvest notes, with both web and Android interfaces. The application supports offline functionality and automatic synchronization when online.
+A cross-platform application for logging and managing kitchen garden harvest, with both web and Android interfaces. The application supports offline functionality and automatic synchronization when online.
 
 ## Project Structure
 
@@ -18,6 +18,8 @@ HarvestMunshi/
 ```
 
 ## Web Application Setup
+
+Webapp is hosted on github pages at https://shahrajvi.github.io/HarvestMunshi/#dashboard 
 
 1. Install dependencies:
    ```bash
