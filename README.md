@@ -17,21 +17,87 @@ HarvestMunshi/
     └── HarvestNotes/    # Harvest notes storage
 ```
 
-## Web Application Setup
+## Web Application Prerequisites, Installation, and Running
 
-Webapp is hosted on github pages at https://shahrajvi.github.io/HarvestMunshi/#dashboard 
+### Prerequisites
 
-1. Install dependencies:
+- **Node.js** (version 14 or higher recommended)
+  - Download from: https://nodejs.org/
+- **npm** (comes with Node.js)
+- **Internet connection** (required for Firebase/Firestore)
+- **Firebase Project** (optional, if you want to use your own Firestore database)
+  - If you want to use your own Firebase project, update the credentials in `firebaseconfig.js`.
+
+### Installation Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd HarvestMunshi
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
+   This will install all required Node.js packages, including:
+   - express
+   - firebase
+   - winston
+   - archiver
 
-2. Start the server:
+3. **(Optional) Configure Firebase**
+   - The app is pre-configured to use a sample Firebase project.
+   - To use your own Firebase/Firestore:
+     1. Go to [Firebase Console](https://console.firebase.google.com/).
+     2. Create a new project.
+     3. In Project Settings, add a web app and copy the config.
+     4. Replace the values in `firebaseconfig.js`:
+        ```js
+        const firebaseConfig = {
+          apiKey: "...",
+          authDomain: "...",
+          projectId: "...",
+          storageBucket: "...",
+          messagingSenderId: "...",
+          appId: "...",
+          measurementId: "..."
+        };
+        ```
+
+### Running the Web App
+
+1. **Start the server**
+   ```bash
+   npm start
+   ```
+   or
    ```bash
    node app.js
    ```
 
-3. Access the web application at `http://localhost:3001`
+2. **Open the app in your browser**
+   - Go to: [http://localhost:3001](http://localhost:3001)
+
+### Build/Run Commands
+
+| Task                | Command            |
+|---------------------|-------------------|
+| Install dependencies| `npm install`     |
+| Start server        | `npm start`       |
+| Start server (alt)  | `node app.js`     |
+
+### Notes
+
+- The server will automatically create log files in the `logs/` directory if they do not exist.
+- If port 3001 is already in use, the server will retry after 10 seconds.
+- For real-time and persistent data, ensure your Firebase project is set up and Firestore rules allow read/write access for your app.
+
+### Troubleshooting
+
+- **Port already in use:** Stop other apps using port 3001 or change the port in `app.js`.
+- **Firebase errors:** Double-check your `firebaseconfig.js` credentials and Firestore rules.
+- **LocalStorage issues:** Make sure your browser allows localStorage and you are not in incognito/private mode.
 
 ## Android Application Setup
 

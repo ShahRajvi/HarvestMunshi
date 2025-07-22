@@ -474,11 +474,12 @@ function updateUI() {
 // Tab switching functionality
 document.addEventListener('DOMContentLoaded', () => {
     // Load saved data
-    `loadData`();
+    loadData();
 
     // Set up tab switching
     const tabButtons = document.querySelectorAll('.tab-button');
     const pages = document.querySelectorAll('.page-content');
+    
 
     function switchPage(pageId, cropId = null) {
         // Remove active class from all buttons and pages
@@ -487,10 +488,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Set new active page and button
         const newPage = document.getElementById(pageId);
-        newPage.classList.add('active');
+        if (newPage) newPage.classList.add('active');
         
         if (pageId !== 'crop-details') {
-        document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+            const tabBtn = document.querySelector(`[data-page="${pageId}"]`);
+            if (tabBtn) tabBtn.classList.add('active');
         } else if (cropId) {
             showCropDetails(cropId);
         }
@@ -791,7 +793,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set up export logs button
     const exportLogsButton = document.getElementById('export-logs-button');
     if (exportLogsButton) {
-        exportLogsButton.addEventListener('click', downloadLogs);
+        exportLogsButton.addEventListener('click', async () => {
+            try {
+                const response = await fetchWithRetry('/api/download-logs');
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'harvest-logs.zip';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error('Error downloading logs:', error);
+            }
+        });
     }
 }); 
 
@@ -873,22 +890,24 @@ function fetchWithRetry(url, options = {}) {
 }
 
 // Example of updating an existing fetch call:
-document.getElementById('export-logs-button').addEventListener('click', async () => {
-    try {
-        const response = await fetchWithRetry('/api/download-logs');
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'harvest-logs.zip';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-    } catch (error) {
-        console.error('Error downloading logs:', error);
-    }
-}); 
+// This block is now redundant as the event listener handles the fetchWithRetry call directly.
+// Keeping it for now as it might be used elsewhere or for clarity.
+// document.getElementById('export-logs-button').addEventListener('click', async () => {
+//     try {
+//         const response = await fetchWithRetry('/api/download-logs');
+//         const blob = await response.blob();
+//         const url = window.URL.createObjectURL(blob);
+//         const a = document.createElement('a');
+//         a.href = url;
+//         a.download = 'harvest-logs.zip';
+//         document.body.appendChild(a);
+//         a.click();
+//         window.URL.revokeObjectURL(url);
+//         document.body.removeChild(a);
+//     } catch (error) {
+//         console.error('Error downloading logs:', error);
+//     }
+// }); 
 
 window.addHarvest = addHarvest;
 window.deleteCrop = deleteCrop; 

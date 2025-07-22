@@ -11,7 +11,7 @@ const firebaseConfig = {
     messagingSenderId: "975966104855", // Your Cloud Messaging Sender ID (if using)
     appId: "1:975966104855:web:b8741ba4fb46148b9e5b52", // Your Firebase App ID
     measurementId: "G-BJYRVSTHN7" // Your Google Analytics Measurement ID (if using)
-  };s
+  };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
